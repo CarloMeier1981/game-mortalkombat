@@ -79,6 +79,8 @@ Jedes GLB wird per `preloadSkeletal(url)` beim Spielstart einmal geladen und als
 
 `js/characters/CharacterData.js` exportiert `CHARACTERS` (Array, jeder Eintrag = vollständiges Balancing + Optik + optional `model3d`/`rigKind`) und `getCharacter(id)`. `js/arenas/ArenaData.js` exportiert `ARENAS` analog — jede Arena zeichnet ihren Hintergrund über ein Foto in `backgrounds/*.png` (Cover-Crop, siehe `drawImageCover()`), keine prozeduralen Hintergründe mehr. Neue Kämpfer/Arenen hinzufügen = neuer Array-Eintrag; UI (Charakterauswahl, Arcade-Leiter, Zufallsgegner-Pool) iteriert überall dynamisch über diese Arrays, ohne Anzahl-Annahmen.
 
+Die Charakterauswahl-Portraits sind keine gespeicherten Bilder, sondern Snapshots des echten 3D-Rigs: `js/characters/PortraitRenderer.js` baut pro Charakter einmalig eine eigene Mini-Szene (eigener `WebGLRenderer`, eigene Kamera/Lichter, unabhängig vom Gameplay-`Renderer3D`), posiert das Rig in einer leichten 3/4-Ansicht und rendert es auf einen Offscreen-Canvas zu einer Data-URL, die dann als `background-image` in der UI landet (`UIManager._applyPortrait()`, mit Farbverlauf-Fallback + Nachlade-Retry, solange das Modell noch lädt). Ergebnis wird pro Charakter-ID gecacht — läuft also nur einmal pro Session.
+
 ### Sonstiges
 
 - **Audio** (`js/core/AudioManager.js`): komplett prozedural per WebAudio-API synthetisiert (Oszillatoren, gefilterter Noise-Burst, WaveShaper-Sättigung) — keine Audiodateien im Projekt.

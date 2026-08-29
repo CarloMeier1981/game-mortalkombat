@@ -1,5 +1,7 @@
 import { CHARACTERS } from '../characters/CharacterData.js';
 import { ARENAS } from '../arenas/ArenaData.js';
+import { renderPortrait } from '../characters/PortraitRenderer.js';
+import { preloadSkeletal } from '../characters/SkeletalRig3D.js';
 
 const SCREEN_IDS = [
   'menu', 'character-select', 'arena-select', 'settings', 'tutorial',
@@ -114,11 +116,45 @@ export class UIManager {
       const card = document.createElement('div');
       card.className = 'char-card';
       if (selection.p1 === c.id || selection.p2 === c.id) card.classList.add('selected');
-      card.innerHTML = `<div class="char-swatch" style="background:linear-gradient(160deg, ${c.color.primary}, ${c.color.secondary})"></div><div class="char-card-name">${c.name}</div>`;
+      const swatch = document.createElement('div');
+      swatch.className = 'char-swatch';
+      this._applyPortrait(swatch, c);
+      const label = document.createElement('div');
+      label.className = 'char-card-name';
+      label.textContent = c.name;
+      card.appendChild(swatch);
+      card.appendChild(label);
       card.addEventListener('click', () => this.game.pickCharacter(c.id));
       this.el.charGrid.appendChild(card);
     });
     this.updateCharacterDetail(selection);
+  }
+
+  // Character portraits are snapshots of the real 3D fighter rig (see PortraitRenderer.js),
+  // rendered lazily once each model has finished loading. Falls back to a color gradient
+  // until then, then swaps to the real portrait as soon as it's ready.
+  _applyPortrait(el, charData) {
+    const fallback = () => {
+      el.style.backgroundImage = 'none';
+      el.style.background = `linear-gradient(160deg, ${charData.color.primary}, ${charData.color.secondary})`;
+    };
+    const apply = (url) => {
+      el.style.background = 'none';
+      el.style.backgroundImage = `url('${url}')`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+    };
+    const url = renderPortrait(charData);
+    if (url) {
+      apply(url);
+      return;
+    }
+    fallback();
+    const ready = charData.rigKind === 'skeletal' ? preloadSkeletal(charData.model3d) : Promise.resolve();
+    ready.then(() => {
+      const lateUrl = renderPortrait(charData);
+      if (lateUrl) apply(lateUrl);
+    });
   }
 
   updateCharacterDetail(selection) {
@@ -128,6 +164,7 @@ export class UIManager {
       this.el.confirmCharBtn.disabled = true;
       this.el.selectStatus.textContent = selection.slot === 'p2' ? 'PLAYER 2: CHOOSE A FIGHTER' : 'PLAYER 1: CHOOSE A FIGHTER';
       this.el.detailPortrait.style.background = 'transparent';
+      this.el.detailPortrait.style.backgroundImage = 'none';
       this.el.detailName.textContent = '—';
       this.el.detailTitle.textContent = '—';
       this.el.detailDesc.textContent = '—';
@@ -137,7 +174,7 @@ export class UIManager {
       this.el.charSpecial.textContent = '—';
       return;
     }
-    this.el.detailPortrait.style.background = `linear-gradient(160deg, ${c.color.primary}, ${c.color.secondary})`;
+    this._applyPortrait(this.el.detailPortrait, c);
     this.el.detailName.textContent = c.name;
     this.el.detailTitle.textContent = c.title;
     this.el.detailDesc.textContent = c.description;
