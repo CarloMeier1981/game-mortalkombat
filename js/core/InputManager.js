@@ -8,8 +8,11 @@ const KEYMAP_P1 = {
 };
 const KEYMAP_P2 = {
   ArrowLeft: ['p2', 'left'], ArrowRight: ['p2', 'right'], ArrowUp: ['p2', 'up'], ArrowDown: ['p2', 'down'],
+  // Numpad (desktop) and letter keys (laptops without a numpad) both work for P2 attacks.
   Numpad1: ['p2', 'light'], Numpad2: ['p2', 'heavy'], Numpad3: ['p2', 'special'],
   Numpad0: ['p2', 'block'], NumpadEnter: ['p2', 'dodge'], NumpadDecimal: ['p2', 'grab'],
+  KeyN: ['p2', 'light'], KeyM: ['p2', 'heavy'], KeyB: ['p2', 'special'],
+  KeyV: ['p2', 'block'], KeyC: ['p2', 'dodge'], KeyX: ['p2', 'grab'],
 };
 const PAUSE_KEYS = new Set(['Escape', 'Enter']);
 

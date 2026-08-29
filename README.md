@@ -21,7 +21,7 @@ Danach `index.html` im Browser öffnen (z. B. `http://localhost:8080`).
 ## Steuerung
 
 **Spieler 1 (Tastatur):** A/D bewegen, W springen, S ducken, J leicht, K schwer, L Spezial, U Block, I Ausweichen, O Grab.
-**Spieler 2 (Tastatur):** Pfeiltasten bewegen, Numpad 1/2/3 leicht/schwer/Spezial, Numpad 0 Block, Numpad Enter Ausweichen, Numpad . Grab.
+**Spieler 2 (Tastatur):** Pfeiltasten bewegen, Angriffe wahlweise über Numpad 1/2/3/0/Enter/. **oder** über Buchstaben N (leicht), M (schwer), B (Spezial), V (Block), C (Ausweichen), X (Grab) — praktisch für Laptops ohne Nummernblock.
 **Mobile:** Touch-Steuerkreuz links, Aktionsbuttons rechts.
 **Gamepad:** Erster verbundener Controller wird automatisch Spieler 1 (zweiter Controller Spieler 2).
 
