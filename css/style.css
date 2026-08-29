@@ -242,7 +242,10 @@ html, body {
 .act-dodge { right: 130px; bottom: 130px; width: 38px !important; height: 38px !important; font-size: 0.7rem !important; background: #ffffff14; }
 .act-grab { right: 20px; bottom: 5px; width: 40px !important; height: 40px !important; font-size: 0.65rem !important; }
 
-@media (min-width: 900px) {
+/* Hide touch controls only on true mouse/trackpad desktops, not on wide touchscreens
+   (tablets in landscape are often >=900px, which a width-only breakpoint would wrongly
+   treat as "desktop" and hide the buttons on). */
+@media (hover: hover) and (pointer: fine) {
   #touch-root.active { display: none !important; }
 }
 
