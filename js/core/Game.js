@@ -67,7 +67,7 @@ export class Game {
     this.tutorialIndex = 0;
     this.trainingStats = { damage: 0, hits: 0, elapsed: 0 };
     this.currentArena = null;
-    this.menuArena = getArena('void');
+    this.menuArena = getArena('blackmountains');
     this.previousState = GameStates.MENU;
 
     window.addEventListener('resize', () => this.renderer.resize());
@@ -126,7 +126,7 @@ export class Game {
       this._updateFight(dt);
     } else {
       this.cameraFX.update(dt);
-      this.particles.ambient(this.currentArena ? this.currentArena.id : 'void', dt);
+      this.particles.ambient(this.currentArena ? this.currentArena.id : 'blackmountains', dt);
       this.particles.update(dt);
     }
 

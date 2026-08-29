@@ -27,6 +27,13 @@ Danach `index.html` im Browser öffnen (z. B. `http://localhost:8080`).
 
 ## Architektur
 
-Siehe `js/` — modular aufgeteilt in `core` (State, Loop, Rendering, Input, Audio, Storage), `characters` (Datenmodell + Laufzeit-Fighter), `combat` (Hit-Resolution, Combo-Tracking), `ai` (Gegner-KI), `arenas` (prozedurale Hintergründe), `fx` (Partikel, Kamera-Shake/Hitstop), `ui` (Menüs, HUD, Touch-Controls) und `modes` (Quick Fight, Arcade, Versus, Training).
+Siehe `js/` — modular aufgeteilt in `core` (State, Loop, Rendering, Input, Audio, Storage), `characters` (Datenmodell + Laufzeit-Fighter), `combat` (Hit-Resolution, Combo-Tracking), `ai` (Gegner-KI), `arenas` (Arena-Hintergründe), `fx` (Partikel, Kamera-Shake/Hitstop), `ui` (Menüs, HUD, Touch-Controls) und `modes` (Quick Fight, Arcade, Versus, Training).
 
-Alle visuellen und akustischen Assets werden prozedural erzeugt (Vektorformen auf Canvas, WebAudio-Synthese) — es werden keine externen Grafik- oder Audio-Dateien benötigt.
+Charaktere, Animationen, Partikel und Audio werden prozedural erzeugt (Vektorformen auf Canvas, WebAudio-Synthese). Die vier Arena-Hintergründe sind Bilddateien unter `backgrounds/`:
+
+| Arena | Datei |
+|---|---|
+| Chinatown | `backgrounds/background_chinatown.png` |
+| Beach | `backgrounds/background_beach.png` |
+| Future City | `backgrounds/background_futurecity.png` |
+| Black Mountains | `backgrounds/background_blackmountains.png` |

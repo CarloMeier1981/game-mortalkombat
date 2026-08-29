@@ -155,7 +155,7 @@ export class UIManager {
       const card = document.createElement('div');
       card.className = 'arena-card';
       if (selection.arena === a.id) card.classList.add('selected');
-      card.innerHTML = `<div class="arena-thumb" style="background:radial-gradient(circle at 50% 30%, ${a.accent}44, #05040688)"></div><div class="arena-card-body"><div class="arena-card-name">${a.name}</div><div class="arena-card-desc">${a.description}</div></div>`;
+      card.innerHTML = `<div class="arena-thumb" style="background-image:url('backgrounds/background_${a.id}.png');background-size:cover;background-position:center 35%"></div><div class="arena-card-body"><div class="arena-card-name">${a.name}</div><div class="arena-card-desc">${a.description}</div></div>`;
       card.addEventListener('click', () => this.game.pickArena(a.id));
       this.el.arenaGrid.appendChild(card);
     });

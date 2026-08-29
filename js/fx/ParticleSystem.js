@@ -58,6 +58,15 @@ export class ParticleSystem {
           p.gravity = 0;
           p.maxLife = 3;
           break;
+        case 'mist':
+          p.vx = (Math.random() - 0.5) * 0.3;
+          p.vy = (Math.random() - 0.5) * 0.08;
+          p.size = 40 + Math.random() * 70;
+          p.color = opts.color || '#ffffff';
+          p.gravity = 0;
+          p.maxLife = 7;
+          p.alphaScale = 0.1;
+          break;
         default:
           p.vx = 0; p.vy = 0; p.size = 3; p.color = '#fff'; p.gravity = 0;
       }
@@ -68,11 +77,13 @@ export class ParticleSystem {
   ambient(arenaId, dt) {
     this._ambientTimer -= dt;
     if (this._ambientTimer > 0) return;
-    this._ambientTimer = arenaId === 'ruins' ? 0.015 : 0.09;
+    this._ambientTimer = arenaId === 'futurecity' ? 0.015 : 0.12;
     const x = WORLD.left + Math.random() * (WORLD.right - WORLD.left);
-    if (arenaId === 'forge') this.emit('ember', x, WORLD.floorY + 20, { count: 1 });
-    else if (arenaId === 'ruins') this.emit('rain', Math.random() * WORLD.width, -10, { count: 2 });
-    else if (arenaId === 'void') this.emit('energy', x, 100 + Math.random() * 400, { count: 1 });
+    if (arenaId === 'chinatown') this.emit('ember', x, WORLD.floorY + 20, { count: 1 });
+    else if (arenaId === 'futurecity') this.emit('rain', Math.random() * WORLD.width, -10, { count: 2 });
+    else if (arenaId === 'beach' || arenaId === 'blackmountains') {
+      this.emit('mist', x, WORLD.floorY - 60 - Math.random() * 220, { count: 1 });
+    }
   }
 
   update(dt) {
@@ -91,7 +102,7 @@ export class ParticleSystem {
   draw(ctx) {
     for (const p of this.particles) {
       const alpha = 1 - p.life / p.maxLife;
-      ctx.globalAlpha = Math.max(0, alpha);
+      ctx.globalAlpha = Math.max(0, alpha) * (p.alphaScale || 1);
       ctx.fillStyle = p.color;
       if (p.type === 'rain') {
         ctx.strokeStyle = p.color;

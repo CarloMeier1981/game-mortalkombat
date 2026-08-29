@@ -107,8 +107,13 @@ export class AudioManager {
     if (this.currentArenaId === arenaId && this.musicTimer) return;
     this.stopMusic();
     this.currentArenaId = arenaId;
-    const baseFreqs = { forge: [55, 82.4, 98], ruins: [49, 73.4, 87.3], void: [43.6, 65.4, 77.8] };
-    const freqs = baseFreqs[arenaId] || baseFreqs.forge;
+    const baseFreqs = {
+      chinatown: [55, 82.4, 98],
+      beach: [49, 73.4, 92.5],
+      futurecity: [43.6, 65.4, 77.8],
+      blackmountains: [41.2, 61.7, 87.3],
+    };
+    const freqs = baseFreqs[arenaId] || baseFreqs.chinatown;
     const drones = freqs.map((f) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
