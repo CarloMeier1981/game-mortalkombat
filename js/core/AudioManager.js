@@ -34,12 +34,27 @@ export class AudioManager {
     if (this.musicGain) this.musicGain.gain.value = v;
   }
 
+  _rand(base, spread) {
+    return base + (Math.random() * 2 - 1) * spread;
+  }
+
   _noiseBuffer(duration) {
     const ctx = this.ctx;
-    const buffer = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
+    const buffer = ctx.createBuffer(1, Math.max(1, ctx.sampleRate * duration), ctx.sampleRate);
     const data = buffer.getChannelData(0);
     for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
     return buffer;
+  }
+
+  _distortionCurve(amount) {
+    const n = 256;
+    const curve = new Float32Array(n);
+    const k = Math.max(0.0001, amount);
+    for (let i = 0; i < n; i++) {
+      const x = (i / (n - 1)) * 2 - 1;
+      curve[i] = Math.tanh(x * k) / Math.tanh(k);
+    }
+    return curve;
   }
 
   _tone(freq, duration, type, gainStart, opts = {}) {
@@ -59,40 +74,111 @@ export class AudioManager {
     osc.stop(ctx.currentTime + duration);
   }
 
-  _burst(duration, gainStart, filterFreq) {
+  // Low-end "body" layer — this is what gives an impact real weight instead of sounding thin.
+  _thump(freqStart, freqEnd, duration, gainStart, type = 'sine') {
+    const ctx = this.ctx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freqStart, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 1), ctx.currentTime + duration);
+    gain.gain.setValueAtTime(gainStart, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }
+
+  _burst(duration, gainStart, filterFreq, opts = {}) {
     const ctx = this.ctx;
     const src = ctx.createBufferSource();
     src.buffer = this._noiseBuffer(duration);
     const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
+    filter.type = opts.filterType || 'lowpass';
     filter.frequency.value = filterFreq;
+    filter.Q.value = opts.Q || 0.7;
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(gainStart, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+
     src.connect(filter);
-    filter.connect(gain);
+    if (opts.distortion) {
+      const shaper = ctx.createWaveShaper();
+      shaper.curve = this._distortionCurve(opts.distortion);
+      filter.connect(shaper);
+      shaper.connect(gain);
+    } else {
+      filter.connect(gain);
+    }
     gain.connect(this.sfxGain);
     src.start();
+  }
+
+  // Very short high-passed noise transient — the "crack" that sits on top of a punch's body.
+  _click(duration, gainStart) {
+    this._burst(duration, gainStart, 4200, { filterType: 'highpass', Q: 0.6 });
   }
 
   play(name) {
     if (!this.ctx) return;
     if (this.ctx.state === 'suspended') this.ctx.resume();
     switch (name) {
-      case 'light': this._burst(0.08, 0.5, 1800); break;
-      case 'heavy': this._burst(0.16, 0.8, 900); this._tone(120, 0.18, 'sine', 0.6, { freqEnd: 60 }); break;
-      case 'block': this._tone(500, 0.1, 'square', 0.35, { freqEnd: 300 }); break;
-      case 'hit': this._burst(0.12, 0.6, 1200); break;
-      case 'special': this._tone(220, 0.5, 'sawtooth', 0.4, { freqEnd: 880 }); this._burst(0.3, 0.3, 4000); break;
-      case 'dash': this._burst(0.1, 0.25, 3000); break;
-      case 'jump': this._tone(300, 0.12, 'sine', 0.25, { freqEnd: 500 }); break;
-      case 'land': this._burst(0.08, 0.35, 600); break;
-      case 'ui': this._tone(700, 0.06, 'square', 0.2, { freqEnd: 900 }); break;
-      case 'victory': this._playJingle([440, 550, 660, 880], 0.14); break;
-      case 'defeat': this._playJingle([440, 380, 300, 220], 0.2); break;
-      case 'grab': this._burst(0.14, 0.5, 700); break;
-      case 'ko': this._tone(90, 0.6, 'sawtooth', 0.7, { freqEnd: 30 }); this._burst(0.5, 0.5, 2000); break;
-      default: break;
+      case 'light':
+        this._click(0.03, 0.42);
+        this._burst(0.06, 0.42, this._rand(2500, 400), { filterType: 'bandpass', Q: 1.1 });
+        this._thump(this._rand(210, 20), 85, 0.08, 0.48);
+        break;
+      case 'heavy':
+        this._click(0.02, 0.3);
+        this._burst(0.15, 0.65, 650, { filterType: 'lowpass', distortion: 5 });
+        this._thump(this._rand(150, 10), 42, 0.22, 0.8, 'triangle');
+        break;
+      case 'block':
+        this._tone(this._rand(820, 40), 0.08, 'square', 0.3, { freqEnd: 1500 });
+        this._tone(this._rand(1240, 50), 0.1, 'triangle', 0.2, { freqEnd: 640 });
+        this._burst(0.045, 0.22, 5200, { filterType: 'highpass' });
+        break;
+      case 'hit':
+        this._burst(0.1, 0.55, 1300, { filterType: 'bandpass', Q: 1 });
+        this._thump(170, 70, 0.1, 0.42);
+        break;
+      case 'special':
+        this._tone(220, 0.5, 'sawtooth', 0.4, { freqEnd: 880 });
+        this._burst(0.3, 0.3, 4000);
+        this._thump(150, 55, 0.35, 0.5, 'triangle');
+        break;
+      case 'dash':
+        this._burst(0.1, 0.25, 3000);
+        break;
+      case 'jump':
+        this._tone(300, 0.12, 'sine', 0.25, { freqEnd: 500 });
+        break;
+      case 'land':
+        this._burst(0.08, 0.35, 600);
+        this._thump(120, 55, 0.08, 0.3);
+        break;
+      case 'ui':
+        this._tone(700, 0.06, 'square', 0.2, { freqEnd: 900 });
+        break;
+      case 'victory':
+        this._playJingle([440, 550, 660, 880], 0.14);
+        break;
+      case 'defeat':
+        this._playJingle([440, 380, 300, 220], 0.2);
+        break;
+      case 'grab':
+        this._click(0.02, 0.25);
+        this._burst(0.18, 0.55, 380, { filterType: 'lowpass' });
+        this._thump(105, 38, 0.24, 0.62, 'triangle');
+        break;
+      case 'ko':
+        this._tone(90, 0.6, 'sawtooth', 0.7, { freqEnd: 30 });
+        this._burst(0.5, 0.5, 1800, { distortion: 4 });
+        this._thump(135, 32, 0.42, 0.65, 'triangle');
+        break;
+      default:
+        break;
     }
   }
 
