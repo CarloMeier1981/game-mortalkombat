@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 import { buildFighterRig, poseRig, disposeRig } from '../characters/FighterRig3D.js';
 import { buildNinjaRig, disposeNinjaRig, isNinjaReady } from '../characters/NinjaRig3D.js';
+import { buildSkeletalRig, disposeSkeletalRig, poseSkeletalRig, isSkeletalReady } from '../characters/SkeletalRig3D.js';
+
+const RIG_KINDS = {
+  // The ninja rig's named parts match the procedural rig's contract exactly, so it
+  // reuses the same poseRig() pose logic — only skeletal (bone-driven) rigs need their own.
+  ninja: { build: buildNinjaRig, dispose: disposeNinjaRig, pose: poseRig, ready: () => isNinjaReady() },
+  skeletal: { build: buildSkeletalRig, dispose: disposeSkeletalRig, pose: poseSkeletalRig, ready: (charData) => isSkeletalReady(charData.model3d) },
+};
 
 export class Renderer3D {
   constructor(canvas) {
@@ -43,21 +51,21 @@ export class Renderer3D {
 
   _getRig(fighter) {
     const cached = this.rigsByFighter.get(fighter);
-    if (cached) return cached.rig;
+    if (cached) return cached;
 
-    const usesNinja = !!fighter.charData.model3d;
-    if (usesNinja && !isNinjaReady()) {
+    const kind = RIG_KINDS[fighter.charData.rigKind];
+    if (kind && !kind.ready(fighter.charData)) {
       // Model still loading — render nothing for this fighter this frame rather
       // than caching a throwaway placeholder rig.
       return null;
     }
 
-    const rig = usesNinja ? buildNinjaRig(fighter.charData) : buildFighterRig(fighter.charData);
-    const dispose = usesNinja ? disposeNinjaRig : disposeRig;
-    this.rigsByFighter.set(fighter, { rig, dispose });
+    const rig = kind ? kind.build(fighter.charData) : buildFighterRig(fighter.charData);
+    const entry = { rig, dispose: kind ? kind.dispose : disposeRig, pose: kind ? kind.pose : poseRig };
+    this.rigsByFighter.set(fighter, entry);
     this.scene.add(rig.group);
     this.activeGroups.push(rig.group);
-    return rig;
+    return entry;
   }
 
   resize(cw, ch, dpr, scale, offsetX, offsetY) {
@@ -75,8 +83,8 @@ export class Renderer3D {
 
   renderFighters(fighters) {
     for (const f of fighters) {
-      const rig = this._getRig(f);
-      if (rig) poseRig(rig, f);
+      const entry = this._getRig(f);
+      if (entry) entry.pose(entry.rig, f);
     }
     this.renderer.render(this.scene, this.camera);
   }

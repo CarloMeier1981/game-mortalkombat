@@ -8,6 +8,7 @@ import { WORLD } from './World.js';
 import { getCharacter, CHARACTERS } from '../characters/CharacterData.js';
 import { Fighter } from '../characters/Fighter.js';
 import { preloadNinja } from '../characters/NinjaRig3D.js';
+import { preloadSkeletal } from '../characters/SkeletalRig3D.js';
 import { CombatSystem } from '../combat/CombatSystem.js';
 import { ComboSystem } from '../combat/ComboSystem.js';
 import { AISystem } from '../ai/AISystem.js';
@@ -83,7 +84,8 @@ export class Game {
     this._syncRenderers();
 
     for (const c of CHARACTERS) {
-      if (c.model3d) preloadNinja(c.model3d);
+      if (c.rigKind === 'ninja') preloadNinja(c.model3d);
+      else if (c.rigKind === 'skeletal') preloadSkeletal(c.model3d);
     }
   }
 
