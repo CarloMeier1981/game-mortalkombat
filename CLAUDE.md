@@ -56,17 +56,16 @@ Angriffsdaten sind vollständig **datengetrieben** in `js/characters/CharacterDa
 ```
 Alle Zeitwerte (`startup`/`active`/`recovery`/`hitstun`/`blockstun`) sind in **Ticks bei 60 Tick/s**, nicht Millisekunden.
 
-### Drei Rig-Typen für die 3D-Darstellung
+### Rig-Typen für die 3D-Darstellung
 
-Acht Kämpfer, ausgewählt über `charData.rigKind` in `Renderer3D.js` (`RIG_KINDS`-Lookup-Tabelle, Fallback = `procedural`):
+Ausgewählt über `charData.rigKind` in `Renderer3D.js` (`RIG_KINDS`-Lookup-Tabelle):
 
 | `rigKind` | Kämpfer | Modul | Funktionsweise |
 |---|---|---|---|
-| *(kein Feld)* = procedural | Varkan, Nyra, Kael, Morvan | `FighterRig3D.js` | Reine Kapsel-/Kugel-Primitive, zur Laufzeit gebaut. `poseRig()` treibt benannte Teile (`legLPivot`, `armFrontPivot`, `head`, …) anhand von `fighter.state`. |
-| `'ninja'` | Kage | `NinjaRig3D.js` | In Blender aus Primitiven gebautes GLB (`models/ninja.glb`). Die Pivot-Objekte im Blender-Rig sind **exakt** wie beim procedural-Rig benannt → nutzt dieselbe `poseRig()`-Funktion aus `FighterRig3D.js` unverändert mit. |
+| *(kein Feld)* = procedural | — aktuell kein Kämpfer, bleibt als Fallback im Dispatch | `FighterRig3D.js` | Reine Kapsel-/Kugel-Primitive, zur Laufzeit gebaut. `poseRig()` treibt benannte Teile (`legLPivot`, `armFrontPivot`, `head`, …) anhand von `fighter.state`. Wird derzeit von `Renderer3D._getRig()` als Default verwendet, falls ein Charakter kein `rigKind` setzt. |
 | `'skeletal'` | Cassius, Brannok, Solkan | `SkeletalRig3D.js` | Fertig geriggte, texturierte Charaktere aus `avatar-templates/` (Quaternius-artige FBX-Packs), per `tools/convert_skeletal_template.py` zu GLB konvertiert. Eigene `poseSkeletalRig()`-Logik (Bone-Rotation statt Pivot-Objekte). |
 
-Jedes GLB wird per `preload*(url)` beim Spielstart einmal geladen und als Template gecacht (`Game.js`-Konstruktor); `_getRig()` in `Renderer3D.js` klont daraus pro Fighter-Instanz und rendert nichts, solange das Template noch lädt (kein Platzhalter-Rig).
+Jedes GLB wird per `preloadSkeletal(url)` beim Spielstart einmal geladen und als Template gecacht (`Game.js`-Konstruktor); `_getRig()` in `Renderer3D.js` klont daraus pro Fighter-Instanz und rendert nichts, solange das Template noch lädt (kein Platzhalter-Rig).
 
 **Gotchas bei neuen 3D-Kämpfern** (alle schon einmal live debuggt, siehe Git-Historie):
 - `THREE.CapsuleGeometry(0.5, 1, …)` hat lokale **Höhe 2**, nicht 1 (Radius 0.5 an jeder Kappe zusätzlich zur Länge) — beim Skalieren durch 2 teilen, sonst überlappen sich alle Körperteile.
@@ -74,6 +73,7 @@ Jedes GLB wird per `preload*(url)` beim Spielstart einmal geladen und als Templa
 - Skinned-Mesh-Charaktere (rigKind `skeletal`) **müssen** mit `SkeletonUtils.clone()` (`js/vendor/utils/SkeletonUtils.js`) statt normalem `Object3D.clone(true)` instanziiert werden — sonst zeigen alle Klone auf dieselben Bone-Objekte und beeinflussen sich gegenseitig.
 - Diese Skinned-Mesh-Vorlagen haben typischerweise eine **T-Pose als Bind-Pose** und keine gebackenen Animationsclips. Posen werden durch Rotation relativ zur gebackenen Rest-Rotation der Bones erreicht (`bone.rotation.set(rest.x, rest.y, rest.z + delta)`), nicht durch Setzen absoluter Winkel.
 - Beim Aufräumen (`Renderer3D.clearFighters()`) wird pro Rig-Typ nur **klonierte Materialien** disposed, niemals die geteilte Template-Geometrie (die wird über die gesamte Session wiederverwendet).
+- Ein früherer dritter Rig-Typ (`'ninja'`, statisches GLB mit benannten Pivot-Objekten statt Bones, nutzte `poseRig()` aus `FighterRig3D.js` unverändert mit) wurde inzwischen wieder entfernt (Charakter Kage gelöscht) — als Muster aber weiterhin brauchbar, falls ein neuer primitiv-modellierter (nicht geriggter) 3D-Kämpfer gebraucht wird: `models/*.glb`-Objekte exakt wie im procedural-Rig benennen, dann funktioniert `poseRig()` ohne Änderung.
 
 ### Charakter-/Arena-Daten
 
@@ -83,4 +83,4 @@ Jedes GLB wird per `preload*(url)` beim Spielstart einmal geladen und als Templa
 
 - **Audio** (`js/core/AudioManager.js`): komplett prozedural per WebAudio-API synthetisiert (Oszillatoren, gefilterter Noise-Burst, WaveShaper-Sättigung) — keine Audiodateien im Projekt.
 - **Persistenz**: Settings/Fortschritt über `localStorage`, gekapselt in `js/core/Storage.js`.
-- **Asset-Ordner**: `backgrounds/` (Arena-Fotos, im Spiel geladen), `models/` (kompilierte GLBs, im Spiel geladen), `avatar-pics/` (Referenzbilder für Kage, nur Doku), `avatar-templates/` (rohe FBX-Quellpacks für die Skeletal-Kämpfer). Es gibt kein `.gitignore` — `avatar-templates/` wurde bisher bewusst nie mit `git add` erfasst (reines lokales Rohmaterial, nicht laufzeitrelevant), taucht also als untracked in `git status` auf.
+- **Asset-Ordner**: `backgrounds/` (Arena-Fotos, im Spiel geladen), `models/` (kompilierte GLBs, im Spiel geladen), `avatar-templates/` (rohe FBX-Quellpacks für die Skeletal-Kämpfer). `avatar-pics/` enthält Referenzbilder (u. a. für den inzwischen gelöschten Kage, plus mindestens ein noch ungenutztes Konzeptbild) — reines Design-Rohmaterial, nicht laufzeitrelevant. Es gibt kein `.gitignore` — `avatar-templates/` wurde bisher bewusst nie mit `git add` erfasst (reines lokales Rohmaterial, nicht laufzeitrelevant), taucht also als untracked in `git status` auf.

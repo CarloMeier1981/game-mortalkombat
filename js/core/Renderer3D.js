@@ -1,12 +1,8 @@
 import * as THREE from 'three';
 import { buildFighterRig, poseRig, disposeRig } from '../characters/FighterRig3D.js';
-import { buildNinjaRig, disposeNinjaRig, isNinjaReady } from '../characters/NinjaRig3D.js';
 import { buildSkeletalRig, disposeSkeletalRig, poseSkeletalRig, isSkeletalReady } from '../characters/SkeletalRig3D.js';
 
 const RIG_KINDS = {
-  // The ninja rig's named parts match the procedural rig's contract exactly, so it
-  // reuses the same poseRig() pose logic — only skeletal (bone-driven) rigs need their own.
-  ninja: { build: buildNinjaRig, dispose: disposeNinjaRig, pose: poseRig, ready: () => isNinjaReady() },
   skeletal: { build: buildSkeletalRig, dispose: disposeSkeletalRig, pose: poseSkeletalRig, ready: (charData) => isSkeletalReady(charData.model3d) },
 };
 

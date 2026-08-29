@@ -10,7 +10,7 @@ export const DEFAULT_SETTINGS = {
 };
 
 export const DEFAULT_PROGRESS = {
-  unlocked: ['varkan', 'nyra', 'kael', 'morvan'],
+  unlocked: ['cassius', 'brannok', 'solkan'],
   arcadeBestStreak: 0,
   arcadeCleared: false,
 };

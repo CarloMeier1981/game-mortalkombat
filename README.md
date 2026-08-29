@@ -31,20 +31,15 @@ Siehe `js/` — modular aufgeteilt in `core` (State, Loop, Rendering, Input, Aud
 
 **Rendering:** Zwei überlagerte Canvas-Elemente. `#game-canvas` (2D) zeichnet Arena-Hintergrund, Partikel und Projektile; `#game-canvas-3d` (WebGL via Three.js, transparent) rendert die Kämpfer als echte, beleuchtete 3D-Rigs — die Spiellogik (Positionen, Hitboxes, Physik) bleibt vollständig 2D, nur die Darstellung der Figuren ist 3D. Three.js liegt als einzelne vendorte Datei unter `js/vendor/three.module.min.js` (MIT-Lizenz, siehe `js/vendor/THREE_LICENSE.txt`), per Import Map eingebunden — kein Build-Schritt, kein npm-Install zur Laufzeit nötig.
 
-Acht Kämpfer, drei Rig-Typen (`js/core/Renderer3D.js` wählt je Charakter über `charData.rigKind` aus):
+Drei Kämpfer, alle über echte, in Blender konvertierte 3D-Modelle dargestellt (`js/core/Renderer3D.js` wählt je Charakter über `charData.rigKind` aus — aktuell nutzen alle drei `'skeletal'`; ein prozeduraler Kapsel-/Kugel-Rig-Fallback ohne externes Modell bleibt als Standardpfad in `js/characters/FighterRig3D.js` erhalten):
 
-| Rig-Typ | Kämpfer | Funktionsweise |
-|---|---|---|
-| **procedural** (Standard) | Varkan, Nyra, Kael, Morvan | Reine Kapsel-/Kugel-Primitive, komplett zur Laufzeit gebaut (`js/characters/FighterRig3D.js`). |
-| **ninja** | Kage | In Blender aus Primitiven modelliertes GLB (`models/ninja.glb`), farblich an `avatar-pics/` angelehnt. Statische Körperteile, an benannten Pivot-Objekten (`legLPivot`, `armFrontPivot`, …) aufgehängt — nutzt dieselbe `poseRig()`-Logik wie die prozeduralen Figuren (`js/characters/NinjaRig3D.js`). |
-| **skeletal** | Cassius, Brannok, Solkan | Fertig geriggte, texturierte Low-Poly-Charaktere aus `avatar-templates/` (Army_Free / Skeletons_Free), per Blender zu GLB konvertiert (Textur eingebettet, auf Zielgröße skaliert). Werden über `SkeletonUtils.clone()` instanziiert (normales `Object3D.clone()` verknüpft Skinning-Bone-Referenzen falsch) und per direkter Bone-Rotation (`upper_armL`/`upper_armR`) animiert — kein Baked-Animation-Klip nötig (`js/characters/SkeletalRig3D.js`). |
+| Kämpfer | Funktionsweise |
+|---|---|
+| Cassius, Brannok, Solkan | Fertig geriggte, texturierte Low-Poly-Charaktere aus `avatar-templates/` (Army_Free / Skeletons_Free), per Blender zu GLB konvertiert (Textur eingebettet, auf Zielgröße skaliert). Werden über `SkeletonUtils.clone()` instanziiert (normales `Object3D.clone()` verknüpft Skinning-Bone-Referenzen falsch) und per direkter Bone-Rotation (`upper_armL`/`upper_armR`) animiert — kein Baked-Animation-Klip nötig (`js/characters/SkeletalRig3D.js`). |
 
-Alle drei Loader (GLTFLoader, BufferGeometryUtils, SkeletonUtils) liegen als vendorte Dateien unter `js/vendor/`, per Import Map eingebunden — kein Build-Schritt, kein npm-Install zur Laufzeit nötig.
+Alle Loader (GLTFLoader, BufferGeometryUtils, SkeletonUtils) liegen als vendorte Dateien unter `js/vendor/`, per Import Map eingebunden — kein Build-Schritt, kein npm-Install zur Laufzeit nötig.
 
-Die Modelle sind reproduzierbar/anpassbar über die Skripte in `tools/` — headless neu bauen z. B. mit:
-```bash
-"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python tools/build_ninja_model.py
-```
+Die Modelle sind reproduzierbar/anpassbar über `tools/convert_skeletal_template.py` — siehe Kommentar im Skript für die genauen Aufrufe.
 
 Animationen, Partikel und Audio werden prozedural erzeugt. Die vier Arena-Hintergründe sind Bilddateien unter `backgrounds/`:
 
