@@ -1,0 +1,16 @@
+{
+  "name": "ARENA PULSE",
+  "short_name": "Arena Pulse",
+  "description": "Ein düsterer 2D-Arena-Fighter mit 3D-gerenderten Kämpfern.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "id": "./index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a0808",
+  "theme_color": "#0a0808",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -18,6 +18,12 @@ python -m http.server 8080
 
 Danach `index.html` im Browser öffnen (z. B. `http://localhost:8080`).
 
+## Installation als App (PWA)
+
+Das Spiel ist eine installierbare Progressive Web App (`manifest.json`, `service-worker.js` — Offline-Caching, App-Icons unter `icons/`). Auf einem Android-Tablet/-Handy: Seite in Chrome öffnen → Menü (⋮) → **„App installieren“** bzw. **„Zum Startbildschirm hinzufügen“**. Danach startet das Spiel als eigenständige App (eigenes Icon, kein Browser-UI, funktioniert nach dem ersten Laden auch offline).
+
+Voraussetzung dafür ist, dass die Seite über eine URL (nicht `file://`) erreichbar ist — z. B. über GitHub Pages, oder lokal per `node dev-server.js` im selben WLAN wie das Tablet.
+
 ## Steuerung
 
 **Spieler 1 (Tastatur):** A/D bewegen, W springen, S ducken, J leicht, K schwer, L Spezial, U Block, I Ausweichen, O Grab.
