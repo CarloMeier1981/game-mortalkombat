@@ -3,6 +3,7 @@ import { Storage, DEFAULT_SETTINGS } from './Storage.js';
 import { InputManager } from './InputManager.js';
 import { AudioManager } from './AudioManager.js';
 import { Renderer } from './Renderer.js';
+import { Renderer3D } from './Renderer3D.js';
 import { WORLD } from './World.js';
 import { getCharacter } from '../characters/CharacterData.js';
 import { Fighter } from '../characters/Fighter.js';
@@ -31,13 +32,14 @@ const TUTORIAL_STEPS = [
 ];
 
 export class Game {
-  constructor(canvas, touchRoot) {
+  constructor(canvas, touchRoot, canvas3d) {
     this.canvas = canvas;
     this.touchRoot = touchRoot;
     this.settings = { ...DEFAULT_SETTINGS, ...Storage.loadSettings() };
     this.progress = Storage.loadProgress();
 
     this.renderer = new Renderer(canvas);
+    this.renderer3d = new Renderer3D(canvas3d);
     this.input = new InputManager();
     this.audio = new AudioManager();
     this.particles = new ParticleSystem();
@@ -70,12 +72,20 @@ export class Game {
     this.menuArena = getArena('blackmountains');
     this.previousState = GameStates.MENU;
 
-    window.addEventListener('resize', () => this.renderer.resize());
+    window.addEventListener('resize', () => this._syncRenderers());
     window.addEventListener('blur', () => {
       if (this.state === GameStates.FIGHT || this.state === GameStates.TRAINING) this.togglePause();
     });
     const unlock = () => { this.audio.unlock(); window.removeEventListener('pointerdown', unlock); };
     window.addEventListener('pointerdown', unlock);
+
+    this._syncRenderers();
+  }
+
+  _syncRenderers() {
+    this.renderer.resize();
+    const r = this.renderer;
+    this.renderer3d.resize(r.cw, r.ch, r.dpr, r.scale, r.offsetX, r.offsetY);
   }
 
   init() {
@@ -241,13 +251,14 @@ export class Game {
       this.renderer.renderFight({
         arena: this.currentArena,
         time: this._time,
-        fighters: this.fighters,
         projectiles: this.projectiles,
         particles: this.particles,
         shake: this.cameraFX.getShakeOffset(),
       });
+      this.renderer3d.renderFighters(this.fighters);
     } else {
       this.renderer.renderIdleBackground(this.menuArena, this._time);
+      this.renderer3d.renderer.clear();
     }
 
     if (this.state === GameStates.FIGHT || this.state === GameStates.TRAINING) {
@@ -375,6 +386,8 @@ export class Game {
     const p1Char = getCharacter(sel.p1);
     const p2Char = getCharacter(sel.p2);
     this.currentArena = getArena(sel.arena || randomArena());
+    this.renderer3d.clearFighters();
+    this.renderer3d.setArenaTint(this.currentArena.accent);
     this.fighters = [
       new Fighter(p1Char, 0, 340, 1),
       new Fighter(p2Char, 1, WORLD.width - 340, -1),

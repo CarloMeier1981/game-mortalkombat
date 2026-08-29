@@ -25,14 +25,22 @@ html, body {
 
 #game-root {
   position: fixed; inset: 0;
-  display: flex; align-items: center; justify-content: center;
   background: radial-gradient(ellipse at center, #1a1210 0%, #050404 100%);
 }
 
-#game-canvas {
+#game-canvas, #game-canvas-3d {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
   display: block;
+}
+
+#game-canvas {
   background: #000;
   box-shadow: 0 0 80px #000a;
+}
+
+#game-canvas-3d {
+  pointer-events: none;
 }
 
 #ui-root {
