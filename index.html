@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>ARENA PULSE</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="game-root">
+  <canvas id="game-canvas"></canvas>
+
+  <div id="ui-root">
+
+    <!-- MAIN MENU -->
+    <section class="screen" id="screen-menu">
+      <div class="menu-glow"></div>
+      <h1 class="game-title">ARENA<span>PULSE</span></h1>
+      <p class="game-subtitle">ENTER THE ARENA</p>
+      <nav class="menu-list">
+        <button class="menu-btn" data-action="quick">QUICK FIGHT</button>
+        <button class="menu-btn" data-action="arcade">ARCADE</button>
+        <button class="menu-btn" data-action="versus">VERSUS</button>
+        <button class="menu-btn" data-action="training">TRAINING</button>
+        <button class="menu-btn" data-action="tutorial">TUTORIAL</button>
+        <button class="menu-btn" data-action="settings">SETTINGS</button>
+      </nav>
+      <p class="menu-footer">ORIGINAL IP &middot; NO AFFILIATION WITH ANY EXISTING FIGHTING GAME</p>
+    </section>
+
+    <!-- CHARACTER SELECT -->
+    <section class="screen" id="screen-character-select">
+      <h2 class="screen-title">CHARACTER SELECT</h2>
+      <div class="char-grid" id="char-grid"></div>
+      <div class="char-detail" id="char-detail">
+        <div class="char-detail-portrait" id="char-detail-portrait"></div>
+        <div class="char-detail-info">
+          <h3 id="char-detail-name">—</h3>
+          <p class="char-detail-title" id="char-detail-title">—</p>
+          <p class="char-detail-desc" id="char-detail-desc">—</p>
+          <div class="stat-row"><span>POWER</span><div class="stat-bar"><div id="stat-power"></div></div></div>
+          <div class="stat-row"><span>SPEED</span><div class="stat-bar"><div id="stat-speed"></div></div></div>
+          <div class="stat-row"><span>DEFENSE</span><div class="stat-bar"><div id="stat-defense"></div></div></div>
+          <p class="char-special" id="char-special">—</p>
+        </div>
+      </div>
+      <div class="select-footer">
+        <span id="select-status">PLAYER 1: CHOOSE A FIGHTER</span>
+        <div class="select-actions">
+          <button class="ghost-btn" data-action="back">BACK</button>
+          <button class="menu-btn" id="btn-confirm-char" disabled>CONFIRM</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARENA SELECT -->
+    <section class="screen" id="screen-arena-select">
+      <h2 class="screen-title">ARENA SELECT</h2>
+      <div class="arena-grid" id="arena-grid"></div>
+      <div class="select-footer">
+        <span>CHOOSE YOUR BATTLEGROUND</span>
+        <div class="select-actions">
+          <button class="ghost-btn" data-action="back">BACK</button>
+          <button class="menu-btn" id="btn-confirm-arena" disabled>FIGHT!</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="screen" id="screen-settings">
+      <h2 class="screen-title">SETTINGS</h2>
+      <div class="settings-list">
+        <label class="settings-row">MUSIC VOLUME
+          <input type="range" id="opt-music" min="0" max="1" step="0.05">
+        </label>
+        <label class="settings-row">SFX VOLUME
+          <input type="range" id="opt-sfx" min="0" max="1" step="0.05">
+        </label>
+        <label class="settings-row">VIBRATION
+          <input type="checkbox" id="opt-vibration">
+        </label>
+        <label class="settings-row">GRAPHICS QUALITY
+          <select id="opt-quality">
+            <option value="high">HIGH</option>
+            <option value="medium">MEDIUM</option>
+            <option value="low">LOW</option>
+          </select>
+        </label>
+        <label class="settings-row">LANGUAGE
+          <select id="opt-language">
+            <option value="de">DEUTSCH</option>
+            <option value="en">ENGLISH</option>
+          </select>
+        </label>
+      </div>
+      <button class="ghost-btn" data-action="back">BACK</button>
+    </section>
+
+    <!-- TUTORIAL -->
+    <section class="screen" id="screen-tutorial">
+      <h2 class="screen-title">TUTORIAL</h2>
+      <div class="tutorial-box">
+        <p class="tutorial-step" id="tutorial-text">—</p>
+        <div class="tutorial-progress" id="tutorial-progress"></div>
+      </div>
+      <div class="select-actions">
+        <button class="ghost-btn" data-action="back">SKIP</button>
+        <button class="menu-btn" id="btn-tutorial-next">WEITER</button>
+      </div>
+    </section>
+
+    <!-- FIGHT HUD -->
+    <section class="screen" id="screen-hud">
+      <div class="hud-top">
+        <div class="hud-player hud-left">
+          <div class="hud-name" id="hud-name-p1">—</div>
+          <div class="bar health-bar"><div class="bar-fill" id="health-p1"></div></div>
+          <div class="bar special-bar"><div class="bar-fill" id="special-p1"></div></div>
+        </div>
+        <div class="hud-center">
+          <div class="round-pips" id="round-pips-p1"></div>
+          <div class="hud-timer" id="hud-timer">60</div>
+          <div class="round-pips" id="round-pips-p2"></div>
+        </div>
+        <div class="hud-player hud-right">
+          <div class="hud-name" id="hud-name-p2">—</div>
+          <div class="bar health-bar"><div class="bar-fill" id="health-p2"></div></div>
+          <div class="bar special-bar"><div class="bar-fill" id="special-p2"></div></div>
+        </div>
+      </div>
+
+      <div class="combo-display" id="combo-p1"></div>
+      <div class="combo-display combo-right" id="combo-p2"></div>
+
+      <div class="training-stats" id="training-stats"></div>
+
+      <div class="center-banner" id="center-banner"></div>
+
+      <button class="pause-btn" data-action="pause">II</button>
+    </section>
+
+    <!-- PAUSE -->
+    <section class="screen" id="screen-pause">
+      <h2 class="screen-title">PAUSED</h2>
+      <nav class="menu-list">
+        <button class="menu-btn" data-action="resume">RESUME</button>
+        <button class="menu-btn" data-action="restart">RESTART</button>
+        <button class="menu-btn" data-action="quit">QUIT TO MENU</button>
+      </nav>
+    </section>
+
+    <!-- MATCH END -->
+    <section class="screen" id="screen-match-end">
+      <h2 class="screen-title" id="match-end-title">VICTORY</h2>
+      <p class="match-end-sub" id="match-end-sub"></p>
+      <nav class="menu-list">
+        <button class="menu-btn" id="btn-rematch">REMATCH</button>
+        <button class="menu-btn" id="btn-next" style="display:none">NEXT OPPONENT</button>
+        <button class="ghost-btn" data-action="quit">MAIN MENU</button>
+      </nav>
+    </section>
+
+  </div>
+
+  <div id="touch-root"></div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

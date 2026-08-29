@@ -1,0 +1,93 @@
+// Frame values are expressed in simulation ticks (fixed timestep, 60 ticks/sec).
+// All characters, attacks and stats are original creations for ARENA PULSE.
+
+export const CHARACTERS = [
+  {
+    id: 'varkan',
+    name: 'VARKAN',
+    title: 'DER GEFALLENE WÄCHTER',
+    description: 'Ein ehemaliger Arenakrieger in schwerer Rüstung. Langsam, aber verheerend im Nahkampf.',
+    color: { primary: '#7a1f1f', secondary: '#2b2624', accent: '#ffb347' },
+    stats: { power: 9, speed: 3, defense: 8 },
+    health: 1150,
+    walkSpeed: 3.4,
+    dashSpeed: 6.5,
+    jumpPower: -16.5,
+    build: { width: 82, height: 168, headR: 20 },
+    specialName: 'SIEGEBREAKER',
+    specialDescription: 'Ein gepanzerter Vorstoß, der den Gegner mit einem einzigen wuchtigen Schlag zu Boden reißt.',
+    attacks: {
+      light: { name: 'Kettenhieb', damage: 8, startup: 6, active: 4, recovery: 12, knockback: 3, hitstun: 12, blockstun: 8, energyGain: 8, range: 78, width: 56, height: 40 },
+      heavy: { name: 'Rammschlag', damage: 20, startup: 14, active: 5, recovery: 24, knockback: 9, hitstun: 20, blockstun: 12, energyGain: 12, range: 92, width: 66, height: 50 },
+      special: { name: 'Siegebreaker', damage: 34, startup: 16, active: 8, recovery: 26, knockback: 14, hitstun: 26, blockstun: 16, energyGain: 0, range: 110, width: 90, height: 70 },
+      grab: { name: 'Eiserner Griff', damage: 18, startup: 9, active: 3, recovery: 22, knockback: 16, hitstun: 24, blockstun: 0, energyGain: 10, range: 58, width: 44, height: 60 },
+    },
+  },
+  {
+    id: 'nyra',
+    name: 'NYRA',
+    title: 'DIE SCHATTENKLINGE',
+    description: 'Eine extrem schnelle Schattenkämpferin mit tödlichen Combos, aber dünner Deckung.',
+    color: { primary: '#2b2b3a', secondary: '#151018', accent: '#7fd8ff' },
+    stats: { power: 5, speed: 10, defense: 4 },
+    health: 850,
+    walkSpeed: 5.6,
+    dashSpeed: 10.5,
+    jumpPower: -18.5,
+    build: { width: 58, height: 150, headR: 16 },
+    specialName: 'SCHATTENSCHNITT',
+    specialDescription: 'Eine blitzschnelle Serie von Klingenhieben aus der Dunkelheit heraus.',
+    attacks: {
+      light: { name: 'Nadelstich', damage: 6, startup: 3, active: 3, recovery: 7, knockback: 1, hitstun: 9, blockstun: 6, energyGain: 7, range: 62, width: 46, height: 34 },
+      heavy: { name: 'Sichelschlag', damage: 15, startup: 9, active: 4, recovery: 16, knockback: 6, hitstun: 16, blockstun: 10, energyGain: 10, range: 74, width: 56, height: 40 },
+      special: { name: 'Schattenschnitt', damage: 30, startup: 10, active: 10, recovery: 20, knockback: 8, hitstun: 24, blockstun: 14, energyGain: 0, range: 100, width: 84, height: 56, multiHit: 3 },
+      grab: { name: 'Schattengriff', damage: 14, startup: 7, active: 3, recovery: 18, knockback: 14, hitstun: 22, blockstun: 0, energyGain: 9, range: 52, width: 40, height: 54 },
+    },
+  },
+  {
+    id: 'kael',
+    name: 'KAEL',
+    title: 'DER ENERGIEKRIEGER',
+    description: 'Ein kontrollierter Kämpfer, der Energieprojektile aus mittlerer Distanz einsetzt.',
+    color: { primary: '#1f4a5c', secondary: '#101a20', accent: '#ffcf6b' },
+    stats: { power: 6, speed: 6, defense: 6 },
+    health: 950,
+    walkSpeed: 4.4,
+    dashSpeed: 8.2,
+    jumpPower: -17.2,
+    build: { width: 66, height: 158, headR: 18 },
+    specialName: 'ENERGIEWELLE',
+    specialDescription: 'Ein gebündelter Energieblitz, der über die gesamte Arena hinweg trifft.',
+    attacks: {
+      light: { name: 'Energiestoß', damage: 7, startup: 5, active: 3, recovery: 10, knockback: 2, hitstun: 10, blockstun: 7, energyGain: 8, range: 70, width: 50, height: 38 },
+      heavy: { name: 'Flammenbogen', damage: 17, startup: 11, active: 5, recovery: 20, knockback: 7, hitstun: 18, blockstun: 11, energyGain: 11, range: 84, width: 60, height: 46 },
+      special: { name: 'Energiewelle', damage: 26, startup: 14, active: 6, recovery: 18, knockback: 10, hitstun: 22, blockstun: 14, energyGain: 0, range: 999, width: 36, height: 30, projectile: true, projectileSpeed: 13 },
+      grab: { name: 'Kraftgriff', damage: 16, startup: 8, active: 3, recovery: 20, knockback: 15, hitstun: 22, blockstun: 0, energyGain: 9, range: 55, width: 42, height: 56 },
+    },
+  },
+  {
+    id: 'morvan',
+    name: 'MORVAN',
+    title: 'DER BERSERKER',
+    description: 'Ein brutaler Nahkämpfer mit enormem Risiko und noch größerer Angriffskraft.',
+    color: { primary: '#5c1414', secondary: '#1c1010', accent: '#ff6b3d' },
+    stats: { power: 10, speed: 5, defense: 5 },
+    health: 1000,
+    walkSpeed: 4.8,
+    dashSpeed: 9.0,
+    jumpPower: -17.8,
+    build: { width: 74, height: 162, headR: 19 },
+    specialName: 'BLUTRAUSCH',
+    specialDescription: 'Eine unaufhaltsame Angriffsserie, die jeden Treffer in massiven Schaden verwandelt.',
+    attacks: {
+      light: { name: 'Faustschlag', damage: 9, startup: 5, active: 3, recovery: 11, knockback: 3, hitstun: 11, blockstun: 7, energyGain: 8, range: 66, width: 52, height: 38 },
+      heavy: { name: 'Wutschwinger', damage: 23, startup: 13, active: 5, recovery: 23, knockback: 10, hitstun: 20, blockstun: 12, energyGain: 12, range: 80, width: 64, height: 48 },
+      special: { name: 'Blutrausch', damage: 38, startup: 12, active: 12, recovery: 22, knockback: 12, hitstun: 28, blockstun: 16, energyGain: 0, range: 90, width: 78, height: 60, multiHit: 4 },
+      grab: { name: 'Zermalmer', damage: 20, startup: 8, active: 3, recovery: 21, knockback: 17, hitstun: 25, blockstun: 0, energyGain: 10, range: 56, width: 46, height: 58 },
+    },
+  },
+];
+
+export function getCharacter(id) {
+  return CHARACTERS.find((c) => c.id === id) || CHARACTERS[0];
+}
