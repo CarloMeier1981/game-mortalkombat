@@ -9,6 +9,14 @@ function makeMaterial(hex) {
   return new THREE.MeshStandardMaterial({ color: hex, roughness: 0.55, metalness: 0.12 });
 }
 
+export function createShadowDisc(w) {
+  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false });
+  const shadow = new THREE.Mesh(SHADOW_GEO, shadowMat);
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.scale.set(w * 0.5, w * 0.32, 1);
+  return { shadow, shadowMat };
+}
+
 export function buildFighterRig(charData) {
   const { build, color } = charData;
   const w = build.width;
@@ -81,10 +89,7 @@ export function buildFighterRig(charData) {
   eye.position.set(headR * 0.95, legH + torsoH + headR * 0.7, headR * 0.35);
   group.add(eye);
 
-  const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false });
-  const shadow = new THREE.Mesh(SHADOW_GEO, shadowMat);
-  shadow.rotation.x = -Math.PI / 2;
-  shadow.scale.set(w * 0.5, w * 0.32, 1);
+  const { shadow, shadowMat } = createShadowDisc(w);
   group.add(shadow);
 
   return {
@@ -102,6 +107,7 @@ export function buildFighterRig(charData) {
     shadow,
     shadowMat,
     materials: { primary: matPrimary, secondary: matSecondary, accent: matAccent },
+    allMaterials: [matPrimary, matSecondary, matAccent],
     dims: { w, h, headR, legH, torsoH, armLen },
   };
 }
@@ -181,9 +187,11 @@ export function poseRig(rig, fighter) {
 
   const frontAngle = fighter.state === 'attack' ? lerp(-0.4, 1.3, clamped) : armAngle;
   armFrontPivot.rotation.z = frontAngle;
-  const reachLen = dims.armLen * 0.8 * (fighter.state === 'attack' ? 1 + clamped * 0.6 : 1);
-  armFront.scale.y = reachLen / 2;
-  armFront.position.y = -reachLen / 2;
+  if (rig.stretchableArm !== false) {
+    const reachLen = dims.armLen * 0.8 * (fighter.state === 'attack' ? 1 + clamped * 0.6 : 1);
+    armFront.scale.y = reachLen / 2;
+    armFront.position.y = -reachLen / 2;
+  }
   const attacking = fighter.state === 'attack' && fighter.attackPhase === 'active';
   armFront.material = attacking ? rig.materials.accent : rig.materials.secondary;
 
@@ -199,8 +207,7 @@ export function poseRig(rig, fighter) {
   const blink = fighter.state === 'hitstun' && Math.floor(t * 30) % 2 === 0;
   const opacity = blink ? 0.45 : 1;
   const transparent = blink;
-  for (const key in rig.materials) {
-    const mat = rig.materials[key];
+  for (const mat of rig.allMaterials) {
     mat.transparent = transparent;
     mat.opacity = opacity;
     if (fighter.invincible) {
@@ -218,8 +225,6 @@ export function disposeRig(rig) {
       obj.geometry.dispose();
     }
   });
-  rig.materials.primary.dispose();
-  rig.materials.secondary.dispose();
-  rig.materials.accent.dispose();
+  for (const mat of rig.allMaterials) mat.dispose();
   rig.shadowMat.dispose();
 }

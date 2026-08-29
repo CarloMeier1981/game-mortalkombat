@@ -5,8 +5,9 @@ import { AudioManager } from './AudioManager.js';
 import { Renderer } from './Renderer.js';
 import { Renderer3D } from './Renderer3D.js';
 import { WORLD } from './World.js';
-import { getCharacter } from '../characters/CharacterData.js';
+import { getCharacter, CHARACTERS } from '../characters/CharacterData.js';
 import { Fighter } from '../characters/Fighter.js';
+import { preloadNinja } from '../characters/NinjaRig3D.js';
 import { CombatSystem } from '../combat/CombatSystem.js';
 import { ComboSystem } from '../combat/ComboSystem.js';
 import { AISystem } from '../ai/AISystem.js';
@@ -80,6 +81,10 @@ export class Game {
     window.addEventListener('pointerdown', unlock);
 
     this._syncRenderers();
+
+    for (const c of CHARACTERS) {
+      if (c.model3d) preloadNinja(c.model3d);
+    }
   }
 
   _syncRenderers() {

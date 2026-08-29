@@ -86,6 +86,28 @@ export const CHARACTERS = [
       grab: { name: 'Zermalmer', damage: 20, startup: 8, active: 3, recovery: 21, knockback: 17, hitstun: 25, blockstun: 0, energyGain: 10, range: 56, width: 46, height: 58 },
     },
   },
+  {
+    id: 'ninja',
+    name: 'KAGE',
+    title: 'DIE SCHATTENKLINGE DES KAGE-CLANS',
+    description: 'Ein lautloser Attentäter mit Katana, der aus der Dunkelheit zuschlägt und wieder verschwindet.',
+    color: { primary: '#141210', secondary: '#0c0a08', accent: '#d4a24a' },
+    stats: { power: 6, speed: 9, defense: 5 },
+    health: 900,
+    walkSpeed: 5.2,
+    dashSpeed: 9.8,
+    jumpPower: -18.0,
+    build: { width: 68, height: 160, headR: 17 },
+    specialName: 'SCHATTENSCHNITT',
+    specialDescription: 'Ein blitzschneller Katana-Wirbel, der den Gegner in einer Serie tödlicher Schnitte erfasst.',
+    model3d: 'models/ninja.glb',
+    attacks: {
+      light: { name: 'Klingenstich', damage: 7, startup: 4, active: 3, recovery: 8, knockback: 2, hitstun: 10, blockstun: 7, energyGain: 8, range: 68, width: 50, height: 36 },
+      heavy: { name: 'Fallender Schnitt', damage: 18, startup: 10, active: 4, recovery: 18, knockback: 7, hitstun: 18, blockstun: 11, energyGain: 11, range: 80, width: 60, height: 44 },
+      special: { name: 'Schattenschnitt', damage: 32, startup: 11, active: 10, recovery: 21, knockback: 9, hitstun: 25, blockstun: 15, energyGain: 0, range: 96, width: 82, height: 56, multiHit: 3 },
+      grab: { name: 'Todesgriff', damage: 15, startup: 7, active: 3, recovery: 19, knockback: 14, hitstun: 22, blockstun: 0, energyGain: 9, range: 54, width: 42, height: 54 },
+    },
+  },
 ];
 
 export function getCharacter(id) {

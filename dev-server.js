@@ -6,7 +6,7 @@ const PORT = 8080;
 const ROOT = __dirname;
 const MIME = {
   '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
-  '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png',
+  '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.glb': 'model/gltf-binary',
 };
 
 http.createServer((req, res) => {

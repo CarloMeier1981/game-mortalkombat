@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { buildFighterRig, poseRig, disposeRig } from '../characters/FighterRig3D.js';
+import { buildNinjaRig, disposeNinjaRig, isNinjaReady } from '../characters/NinjaRig3D.js';
 
 export class Renderer3D {
   constructor(canvas) {
@@ -32,22 +33,30 @@ export class Renderer3D {
   }
 
   clearFighters() {
-    for (const rig of this.rigsByFighter.values()) {
-      this.scene.remove(rig.group);
-      disposeRig(rig);
+    for (const entry of this.rigsByFighter.values()) {
+      this.scene.remove(entry.rig.group);
+      entry.dispose(entry.rig);
     }
     this.rigsByFighter.clear();
     this.activeGroups = [];
   }
 
   _getRig(fighter) {
-    let rig = this.rigsByFighter.get(fighter);
-    if (!rig) {
-      rig = buildFighterRig(fighter.charData);
-      this.rigsByFighter.set(fighter, rig);
-      this.scene.add(rig.group);
-      this.activeGroups.push(rig.group);
+    const cached = this.rigsByFighter.get(fighter);
+    if (cached) return cached.rig;
+
+    const usesNinja = !!fighter.charData.model3d;
+    if (usesNinja && !isNinjaReady()) {
+      // Model still loading — render nothing for this fighter this frame rather
+      // than caching a throwaway placeholder rig.
+      return null;
     }
+
+    const rig = usesNinja ? buildNinjaRig(fighter.charData) : buildFighterRig(fighter.charData);
+    const dispose = usesNinja ? disposeNinjaRig : disposeRig;
+    this.rigsByFighter.set(fighter, { rig, dispose });
+    this.scene.add(rig.group);
+    this.activeGroups.push(rig.group);
     return rig;
   }
 
@@ -67,7 +76,7 @@ export class Renderer3D {
   renderFighters(fighters) {
     for (const f of fighters) {
       const rig = this._getRig(f);
-      poseRig(rig, f);
+      if (rig) poseRig(rig, f);
     }
     this.renderer.render(this.scene, this.camera);
   }

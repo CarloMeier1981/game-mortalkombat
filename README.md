@@ -29,7 +29,14 @@ Danach `index.html` im Browser öffnen (z. B. `http://localhost:8080`).
 
 Siehe `js/` — modular aufgeteilt in `core` (State, Loop, Rendering, Input, Audio, Storage), `characters` (Datenmodell + Laufzeit-Fighter + 3D-Rig), `combat` (Hit-Resolution, Combo-Tracking), `ai` (Gegner-KI), `arenas` (Arena-Hintergründe), `fx` (Partikel, Kamera-Shake/Hitstop), `ui` (Menüs, HUD, Touch-Controls) und `modes` (Quick Fight, Arcade, Versus, Training).
 
-**Rendering:** Zwei überlagerte Canvas-Elemente. `#game-canvas` (2D) zeichnet Arena-Hintergrund, Partikel und Projektile; `#game-canvas-3d` (WebGL via Three.js, transparent) rendert die beiden Kämpfer als echte, beleuchtete 3D-Rigs (Kapseln/Kugeln, `js/characters/FighterRig3D.js`) — die Spiellogik (Positionen, Hitboxes, Physik) bleibt vollständig 2D, nur die Darstellung der Figuren ist 3D. Three.js liegt als einzelne vendorte Datei unter `js/vendor/three.module.min.js` (MIT-Lizenz, siehe `js/vendor/THREE_LICENSE.txt`), per Import Map eingebunden — kein Build-Schritt, kein npm-Install zur Laufzeit nötig.
+**Rendering:** Zwei überlagerte Canvas-Elemente. `#game-canvas` (2D) zeichnet Arena-Hintergrund, Partikel und Projektile; `#game-canvas-3d` (WebGL via Three.js, transparent) rendert die Kämpfer als echte, beleuchtete 3D-Rigs — die Spiellogik (Positionen, Hitboxes, Physik) bleibt vollständig 2D, nur die Darstellung der Figuren ist 3D. Three.js liegt als einzelne vendorte Datei unter `js/vendor/three.module.min.js` (MIT-Lizenz, siehe `js/vendor/THREE_LICENSE.txt`), per Import Map eingebunden — kein Build-Schritt, kein npm-Install zur Laufzeit nötig.
+
+Vier der fünf Kämpfer (Varkan, Nyra, Kael, Morvan) sind rein prozedurale Kapsel-/Kugel-Rigs (`js/characters/FighterRig3D.js`). **KAGE**, der Ninja, ist ein in Blender modelliertes GLB-Modell (`models/ninja.glb`, ~68×160×17 Einheiten, farblich an die Referenzbilder in `avatar-pics/` angelehnt) und wird über `js/vendor/loaders/GLTFLoader.js` geladen (`js/characters/NinjaRig3D.js`). Sein Rig verwendet dieselben benannten Pivot-Objekte (`legLPivot`, `armFrontPivot`, `head`, …) wie die prozeduralen Figuren, wodurch dieselbe `poseRig()`-Animationslogik (Idle-Bob, Lauf, Angriffs-Schwung, Block, Hitstun, K.o.) für beide Rig-Typen funktioniert.
+
+Das Modell ist reproduzierbar/anpassbar über `tools/build_ninja_model.py` — headless neu bauen mit:
+```bash
+"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python tools/build_ninja_model.py
+```
 
 Animationen, Partikel und Audio werden prozedural erzeugt. Die vier Arena-Hintergründe sind Bilddateien unter `backgrounds/`:
 
