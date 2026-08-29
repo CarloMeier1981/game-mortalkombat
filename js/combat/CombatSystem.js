@@ -26,6 +26,7 @@ export class CombatSystem {
       for (const ev of evs) this._handleFighterEvent(f, ev, projectiles);
     }
 
+    this._separateBodies(fA, fB);
     this._resolveMeleeHit(fA, fB);
     this._resolveMeleeHit(fB, fA);
     this._updateProjectiles(projectiles, fighters, dt);
@@ -36,6 +37,23 @@ export class CombatSystem {
     if (['idle', 'walk', 'crouch', 'jump', 'block'].includes(fighter.state)) {
       fighter.facing = opponent.x >= fighter.x ? 1 : -1;
     }
+  }
+
+  _separateBodies(fA, fB) {
+    if (!fA.grounded && !fB.grounded) return;
+    const minDist = (fA.build.width + fB.build.width) * 0.4;
+    const dx = fB.x - fA.x;
+    const dist = Math.abs(dx);
+    if (dist >= minDist || dist < 0.001) return;
+    const overlap = minDist - dist;
+    const dir = dx >= 0 ? 1 : -1;
+    const half = overlap / 2;
+    if (fA.grounded) fA.x -= dir * half;
+    if (fB.grounded) fB.x += dir * half;
+    const halfWA = fA.build.width / 2;
+    const halfWB = fB.build.width / 2;
+    fA.x = Math.min(Math.max(fA.x, WORLD.left + halfWA), WORLD.right - halfWA);
+    fB.x = Math.min(Math.max(fB.x, WORLD.left + halfWB), WORLD.right - halfWB);
   }
 
   _handleFighterEvent(fighter, ev, projectiles) {
